@@ -11,7 +11,7 @@ const emit = defineEmits(['delete'])
       <div>{{ expense.date }}</div>
     </div>
     <div class="actions">
-      <div class="amount">{{ expense.amount }} $</div>
+      <div>{{ expense.amount }} $</div>
       <button class="btn btn-danger" @click="$emit('delete')">Delete</button>
     </div>
   </div>
@@ -24,6 +24,7 @@ const emit = defineEmits(['delete'])
   justify-content: space-evenly;
   align-items: flex-start;
   border: 1px solid;
+  border-radius: 10px;
   margin: 10px auto;
 }
 

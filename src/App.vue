@@ -99,8 +99,8 @@ const filteredExpenses = computed(() => {
 </script>
 
 <template>
-  <div class="container mt-4">
-    <div class="row mb-4 p-3">
+  <div class="container mt-4 p-4">
+    <div class="row p-3">
       <div class="col-md-6">
         <h1>Budget App</h1>
         <h2>
@@ -150,7 +150,7 @@ const filteredExpenses = computed(() => {
     </div>
   </div>
   <div class="row mb-4">
-    <div class="col">
+    <div class="col p-4 m-4">
       <h2>Add an expense</h2>
       <form class="expense-form" @submit.prevent="addExpense" id="expense-form">
         <div class="mb-3">

@@ -4,14 +4,16 @@ const emit = defineEmits(['delete'])
 </script>
 
 <template>
-  <div class="container">
+  <div class="container border rounded-4 border-dark">
     <div class="category-description">
-      <div>{{ expense.category }}</div>
-      <div>{{ expense.description }}</div>
-      <div>{{ expense.date }}</div>
+      <div class="fw-medium">{{ expense.category }}</div>
+      <div class="fw-semibold">{{ expense.description }}</div>
+      <div class="fw-light">{{ expense.date }}</div>
     </div>
     <div class="actions">
-      <div>{{ expense.amount }} $</div>
+      <div>
+        <b>{{ expense.amount }} $</b>
+      </div>
       <button class="btn btn-danger" @click="$emit('delete')">Delete</button>
     </div>
   </div>
@@ -23,8 +25,6 @@ const emit = defineEmits(['delete'])
   flex-direction: row;
   justify-content: space-evenly;
   align-items: flex-start;
-  border: 1px solid;
-  border-radius: 10px;
   margin: 10px auto;
 }
 
@@ -35,5 +35,7 @@ const emit = defineEmits(['delete'])
 
 .actions {
   display: flex;
+  flex-direction: column;
+  padding: 4px auto;
 }
 </style>

@@ -8,4 +8,4 @@ A simple app to manage your expenses and budgets
 - Edit/Delete your expenses if you made a mistake
 - Filters
 
-## Demo
+[Demo](https://slashinkun.github.io/budget-app/)

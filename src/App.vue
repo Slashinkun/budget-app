@@ -12,6 +12,14 @@ const newCategory = ref('')
 
 const filter_category = ref('')
 
+const searchFilter = ref('')
+
+const dateFilter = ref('')
+
+const editingExpenseId = ref(null)
+
+const editedExpense = ref({ amount: 0, category: '', description: '', date: '' })
+
 const remainingBudget = computed(() => {
   let sumExpenses = expenses.value.reduce((acc, expense) => acc + expense.amount, 0)
 
@@ -80,22 +88,60 @@ const deleteExpense = (id) => {
   localStorage.setItem('user_expenses', JSON.stringify(expenses.value))
 }
 
-const filteredExpenses = computed(() => {
-  console.log(filter_category.value)
+const startEdit = (expense) => {
+  editingExpenseId.value = expense.id
+  editedExpense.value = { ...expense }
+}
 
-  if (filter_category.value !== '') {
-    const result = expenses.value.filter((expense) => {
-      console.log(expense.category)
-      return expense.category.toLowerCase() === filter_category.value.toLowerCase()
-    })
+const saveEditedExpense = (id) => {
+  const index = expenses.value.findIndex((expense) => expense.id === id)
 
-    console.log(result)
-
-    return result
+  if (index !== -1) {
+    expenses.value[index] = { ...editedExpense.value }
+    localStorage.setItem('user_expenses', JSON.stringify(expenses.value))
   }
 
-  return expenses.value
+  editingExpenseId.value = null
+}
+
+const cancelEdit = () => {
+  editingExpenseId.value = null
+}
+
+const filteredExpenses = computed(() => {
+  let filteredList = expenses.value
+
+  if (filter_category.value && filter_category.value.trim() !== '') {
+    filteredList = filteredList.filter((expense) => {
+      return (
+        expense.category &&
+        expense.category.toLowerCase().trim() === filter_category.value.toLowerCase().trim()
+      )
+    })
+  }
+
+  if (searchFilter.value && searchFilter.value.trim() !== '') {
+    filteredList = filteredList.filter((expense) => {
+      return (
+        expense.description &&
+        expense.description.toLowerCase().includes(searchFilter.value.toLowerCase().trim())
+      )
+    })
+  }
+
+  if (dateFilter.value && dateFilter.value.trim() !== '') {
+    filteredList = filteredList.filter((expense) => {
+      return expense.date && expense.date === dateFilter.value
+    })
+  }
+
+  return filteredList
 })
+
+const resetFilters = () => {
+  filter_category.value = ''
+  searchFilter.value = ''
+}
 </script>
 
 <template>
@@ -103,9 +149,9 @@ const filteredExpenses = computed(() => {
     <div class="row p-3">
       <div class="col-md-6">
         <h1>Budget App</h1>
-        <h2>
-          Your budget : <span>{{ userBudget }} $</span>
-        </h2>
+        <h3>
+          Your budget : <span>{{ userBudget }}$</span>
+        </h3>
       </div>
       <div class="col md-6 text-end">
         <h4>
@@ -119,9 +165,9 @@ const filteredExpenses = computed(() => {
             >{{ remainingBudget }} $
           </span>
         </h4>
-        <h4>
+        <h5>
           Spent : <span>{{ amountSpent }} $</span>
-        </h4>
+        </h5>
       </div>
     </div>
 
@@ -143,6 +189,7 @@ const filteredExpenses = computed(() => {
             placeholder="Enter your new budget"
             class="form-control"
             v-model="newUserBudget"
+            inputmode="numeric"
           />
           <button class="btn btn-success" @click="validateBudget">Validate</button>
         </div>
@@ -162,6 +209,7 @@ const filteredExpenses = computed(() => {
             v-model.number="newExpense.amount"
             required
             class="form-control"
+            inputmode="numeric"
           />
         </div>
         <div class="mb-3">
@@ -202,18 +250,42 @@ const filteredExpenses = computed(() => {
 
     <div class="row m-4">
       <div class="col">
-        <h4>Filter by</h4>
-        <select id="filter_category" v-model="filter_category">
-          <option value=""></option>
-          <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
-        </select>
+        <h4>Expenses</h4>
+        <div class="filters">
+          <label>Filter : </label>
+          <select id="filter_category" v-model="filter_category">
+            <option value=""></option>
+            <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+          </select>
+          <input type="text" placeholder="Search by description" v-model="searchFilter" />
+          <input type="date" v-model="dateFilter" />
+          <button class="btn btn-danger" @click="resetFilters">Reset Filters</button>
+        </div>
       </div>
+      <div v-if="expenses.length === 0">No expenses</div>
       <div v-for="expense in filteredExpenses" :key="expense.id" class="mb-2">
-        <ExpenseCard
-          :expense="expense"
-          @delete="deleteExpense(expense.id)"
-          :key="expense.id"
-        ></ExpenseCard>
+        <div
+          v-if="expense.id === editingExpenseId"
+          class="m-3 border rounded-4 border-dark p-2 editing-form"
+        >
+          <input type="number" min="1" v-model="editedExpense.amount" />
+          <input type="text" v-model="editedExpense.description" />
+          <select v-model="editedExpense.category">
+            <option value=""></option>
+            <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+          </select>
+          <input type="date" v-model="editedExpense.date" />
+          <button class="btn btn-success" @click="saveEditedExpense(editingExpenseId)">Save</button>
+          <button class="btn btn-danger" @click="cancelEdit">Cancel</button>
+        </div>
+        <div v-else>
+          <ExpenseCard
+            :expense="expense"
+            @delete="deleteExpense(expense.id)"
+            @edit="startEdit(expense)"
+            :key="expense.id"
+          ></ExpenseCard>
+        </div>
       </div>
     </div>
   </div>
@@ -238,5 +310,16 @@ const filteredExpenses = computed(() => {
 
 .average-budget {
   color: orange;
+}
+
+.filters {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.editing-form {
+  display: flex;
+  flex-direction: row;
 }
 </style>

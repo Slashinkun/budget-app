@@ -1,6 +1,6 @@
 <script setup>
 defineProps({ expense: Object })
-const emit = defineEmits(['delete'])
+const emit = defineEmits(['delete', 'edit'])
 </script>
 
 <template>
@@ -11,10 +11,13 @@ const emit = defineEmits(['delete'])
       <div class="fw-light">{{ expense.date }}</div>
     </div>
     <div class="actions">
-      <div>
+      <div class="amount">
         <b>{{ expense.amount }} $</b>
       </div>
-      <button class="btn btn-danger" @click="$emit('delete')">Delete</button>
+      <div class="action-buttons">
+        <button class="btn btn-danger" @click="$emit('delete')">Delete</button>
+        <button class="btn btn-secondary" @click="$emit('edit')">Edit</button>
+      </div>
     </div>
   </div>
 </template>
@@ -37,5 +40,9 @@ const emit = defineEmits(['delete'])
   display: flex;
   flex-direction: column;
   padding: 4px auto;
+}
+
+.amount {
+  font-size: larger;
 }
 </style>

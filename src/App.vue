@@ -315,11 +315,12 @@ const resetFilters = () => {
 .filters {
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  justify-content: space-evenly center;
 }
 
 .editing-form {
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 </style>
